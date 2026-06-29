@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic-settings
+openai
+playwright
+jinja2
+python-multipart
+python-dotenv
+aiofiles

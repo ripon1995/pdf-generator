@@ -1,0 +1,25 @@
+# Environment
+.env
+.venv-pdf-generator/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE
+.idea/
+.vscode/
+
+# Build / dist
+*.egg-info/
+dist/
+build/
+
+# Tests
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db

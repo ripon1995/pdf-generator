@@ -1,0 +1,153 @@
+/* ── Base ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 12pt;
+    line-height: 1.8;
+    color: #1a1a1a;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+/* ── Upload page ── */
+.upload-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+    padding: 48px 56px;
+    width: 480px;
+    text-align: center;
+}
+
+.upload-card h1 {
+    font-size: 22pt;
+    margin: 0 0 8px;
+    color: #111;
+}
+
+.upload-card p {
+    color: #666;
+    margin: 0 0 32px;
+    font-size: 10pt;
+    font-family: sans-serif;
+}
+
+.file-input-label {
+    display: block;
+    border: 2px dashed #bbb;
+    border-radius: 6px;
+    padding: 32px 16px;
+    cursor: pointer;
+    color: #555;
+    font-family: sans-serif;
+    font-size: 10pt;
+    transition: border-color 0.2s;
+    margin-bottom: 24px;
+}
+
+.file-input-label:hover { border-color: #555; }
+
+.file-input-label input { display: none; }
+
+.btn {
+    display: inline-block;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 36px;
+    font-size: 11pt;
+    font-family: sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.btn:hover { background: #333; }
+
+/* ── Preview page ── */
+.preview-bar {
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.preview-bar h2 {
+    margin: 0;
+    font-size: 13pt;
+    font-family: sans-serif;
+    color: #333;
+}
+
+.page-canvas {
+    max-width: 210mm;
+    margin: 32px auto;
+    padding: 0 16px;
+}
+
+.image-section {
+    background: #fff;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+    border-radius: 4px;
+    padding: 20mm;
+    margin-bottom: 32px;
+}
+
+.diagram {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.diagram img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+
+.content {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* ── Print / PDF ── */
+@page {
+    size: A4;
+    margin: 20mm;
+}
+
+@media print {
+    body { background: #fff; }
+    .preview-bar { display: none !important; }
+
+    .page-canvas {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .image-section {
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+        margin-bottom: 0;
+        page-break-after: always;
+    }
+
+    .image-section:last-child { page-break-after: avoid; }
+}

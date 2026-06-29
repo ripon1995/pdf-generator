@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Generator</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="upload-wrapper">
+    <div class="upload-card">
+        <h1>PDF Generator</h1>
+        <p>Upload images containing text, equations, or diagrams.<br>We'll extract the content and build a clean A4 PDF.</p>
+
+        <form action="/pdf/generate" method="post" enctype="multipart/form-data" id="upload-form">
+            <label class="file-input-label" id="file-label">
+                <input type="file" name="images" multiple accept="image/*" id="file-input">
+                <span id="file-hint">Click to choose images, or drag &amp; drop</span>
+            </label>
+            <button type="submit" class="btn" id="submit-btn">Extract &amp; Preview</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('file-input');
+    const hint  = document.getElementById('file-hint');
+    const btn   = document.getElementById('submit-btn');
+
+    input.addEventListener('change', () => {
+        const n = input.files.length;
+        hint.textContent = n === 0
+            ? 'Click to choose images, or drag & drop'
+            : `${n} image${n > 1 ? 's' : ''} selected`;
+    });
+
+    document.getElementById('upload-form').addEventListener('submit', () => {
+        btn.textContent = 'Processing…';
+        btn.disabled = true;
+    });
+</script>
+</body>
+</html>

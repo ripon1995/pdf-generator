@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview — PDF Generator</title>
+    <link rel="stylesheet" href="/static/styles.css">
+
+    <!-- MathJax for LaTeX rendering -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+            },
+            svg: { fontCache: 'global' },
+            startup: { typeset: true },
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+</head>
+<body>
+
+<!-- Top bar — hidden in print/PDF via @media print -->
+<div class="preview-bar">
+    <h2>Preview</h2>
+    <a href="/pdf/download/{{ session_id }}" class="btn">Download PDF</a>
+</div>
+
+<div class="page-canvas">
+    {% for result in results %}
+    <section class="image-section">
+
+        {% if result.has_diagram %}
+        <div class="diagram">
+            <img src="data:{{ result.image_mime }};base64,{{ result.image_b64 }}" alt="Diagram">
+        </div>
+        {% endif %}
+
+        <div class="content">{{ result.content }}</div>
+
+    </section>
+    {% endfor %}
+</div>
+
+</body>
+</html>
