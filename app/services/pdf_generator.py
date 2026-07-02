@@ -12,7 +12,7 @@ async def generate_pdf(html_content: str) -> bytes:
         pdf_bytes = await page.pdf(
             format="A4",
             print_background=True,
-            margin={"top": "20mm", "bottom": "20mm", "left": "20mm", "right": "20mm"},
+            margin={"top": "0mm", "bottom": "0mm", "left": "0mm", "right": "0mm"},
         )
         await browser.close()
         return pdf_bytes

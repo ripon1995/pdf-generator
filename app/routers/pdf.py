@@ -1,6 +1,7 @@
 import base64
 import io
 import uuid
+from pathlib import Path
 
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
@@ -15,11 +16,18 @@ _jinja = Environment(loader=FileSystemLoader("app/templates"), autoescape=True)
 
 _sessions: dict[str, list[dict]] = {}
 
+# Inlined (not linked/referenced by <img src>) so Playwright's page.set_content() —
+# which has no page origin to resolve a relative URL against — still renders styled output.
+_CSS = Path("app/static/styles.css").read_text()
+_LOGO_SVG = Path("app/static/logo.svg").read_text()
+
 
 def _render(results: list[dict], session_id: str) -> str:
     return _jinja.get_template("preview.html").render(
         results=results,
         session_id=session_id,
+        inline_css=_CSS,
+        logo_svg=_LOGO_SVG,
     )
 
 

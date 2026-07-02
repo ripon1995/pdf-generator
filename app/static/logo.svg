@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 320" width="100%" height="100%">
+  <defs>
+    <style>
+      .text-number {
+        font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+        font-weight: 800;
+        fill: #001A40;
+        font-size: 168px;
+        letter-spacing: -2px;
+      }
+      .text-nest {
+        font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+        font-weight: 800;
+        fill: #FFB703;
+        font-size: 168px;
+        letter-spacing: -1px;
+      }
+      .tagline {
+        font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+        font-weight: 700;
+        fill: #001A40;
+        font-size: 26px;
+        letter-spacing: 5.5px;
+      }
+    </style>
+  </defs>
+
+  <!-- Background for contrast presentation -->
+  <rect width="100%" height="100%" fill="#FFFFFF" />
+
+  <g transform="translate(20, 20)">
+    <!-- "Number" Text Section -->
+    <text x="30" y="200" class="text-number">Number</text>
+
+    <!-- The Square Root / Radical Symbol -->
+    <!-- Shifted right to create more space between "Number" and the radical -->
+    <path d="M 645 165
+             L 675 235
+             L 699 68
+             Q 702 56, 714 56
+             L 1075 56"
+          fill="none"
+          stroke="#001A40"
+          stroke-width="15"
+          stroke-linecap="round"
+          stroke-linejoin="round" />
+
+    <!-- "Nest" Text Section (Shifted to match the new radical position) -->
+    <text x="710" y="200" class="text-nest">Nest</text>
+
+    <!-- Bottom Tagline Component -->
+    <!-- Switched to middle text-anchor to keep perfectly aligned with the newly widened layout -->
+    <line x1="120" y1="268" x2="200" y2="268" stroke="#FFB703" stroke-width="3" stroke-linecap="round" />
+
+    <text x="555" y="276" class="tagline" text-anchor="middle">NURTURE NUMBERS, BUILD FUTURES</text>
+
+    <line x1="910" y1="268" x2="990" y2="268" stroke="#FFB703" stroke-width="3" stroke-linecap="round" />
+  </g>
+</svg>

@@ -24,6 +24,13 @@ Before the PDF is downloaded, the user should be shown a preview of the generate
 - Page size: **A4** (210 × 297 mm)
 - Must be print-ready (correct margins, no content clipping)
 
+## Branding & Page Styling
+
+- Every page must have a margin; the **margin color is blue** on all pages.
+- Inside the top margin of every page, show the **NumberNest logo** (black "Number" + black square-root icon + yellow "Nest", with tagline).
+  - Asset: `app/static/logo.svg`. Inlined into `preview.html` server-side (via `logo_svg` template var in `app/routers/pdf.py`) rather than linked, since Playwright's `page.set_content()` has no page origin to resolve a relative `<img src>` against.
+- Each page should include a subtle **mathematical watermark** in the background (e.g. faint math symbols/equations), since generated PDFs are predominantly mathematical content. Watermark must not obscure or interfere with readability of the extracted content.
+
 ## Notes
 
 - Math rendering in the output PDF must support LaTeX (e.g. via WeasyPrint + MathJax, ReportLab, or a LaTeX compiler)

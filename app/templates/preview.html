@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Preview — PDF Generator</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <style>{{ inline_css | safe }}</style>
 
     <!-- MathJax for LaTeX rendering -->
     <script>
@@ -30,16 +30,18 @@
 
 <div class="page-canvas">
     {% for result in results %}
-    <section class="image-section">
+    <section class="page">
+        <div class="brand-mark">{{ logo_svg | safe }}</div>
 
-        {% if result.has_diagram %}
-        <div class="diagram">
-            <img src="data:{{ result.image_mime }};base64,{{ result.image_b64 }}" alt="Diagram">
+        <div class="page-inner">
+            {% if result.has_diagram %}
+            <div class="diagram">
+                <img src="data:{{ result.image_mime }};base64,{{ result.image_b64 }}" alt="Diagram">
+            </div>
+            {% endif %}
+
+            <div class="content">{{ result.content }}</div>
         </div>
-        {% endif %}
-
-        <div class="content">{{ result.content }}</div>
-
     </section>
     {% endfor %}
 </div>
