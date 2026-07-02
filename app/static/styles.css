@@ -103,13 +103,13 @@ body {
     align-items: center;
 }
 
-/* ── Page: the blue band is the margin; brand mark sits on it ── */
+/* ── Page: a thin dark-blue rule marks the margin; brand mark sits top-right ── */
 .page {
     position: relative;
     width: 210mm;
     min-height: 297mm;
-    background: #1e5fbf;
-    padding: 26mm 16mm 16mm;
+    background: #fff;
+    border: 1px solid #001A40;
     margin-bottom: 24px;
     box-shadow: 0 1px 10px rgba(0,0,0,0.15);
 }
@@ -117,23 +117,24 @@ body {
 .brand-mark {
     position: absolute;
     top: 6mm;
-    left: 16mm;
+    right: 16mm;
+    z-index: 2;
 }
 
 .brand-mark svg {
     display: block;
     width: auto;
-    height: 14mm;
+    height: 9.8mm;
 }
 
 .page-inner {
     position: relative;
-    min-height: 255mm;
+    min-height: calc(297mm - 2px);
     background-color: #fff;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Ctext x='8' y='34' font-size='30' fill='%231e5fbf' opacity='0.08' font-family='Georgia,serif'%3E%E2%88%9A%3C/text%3E%3Ctext x='95' y='55' font-size='22' fill='%231e5fbf' opacity='0.08' font-family='Georgia,serif'%3E%CF%80%3C/text%3E%3Ctext x='25' y='105' font-size='24' fill='%231e5fbf' opacity='0.08' font-family='Georgia,serif'%3E%E2%88%AB%3C/text%3E%3Ctext x='105' y='135' font-size='20' fill='%231e5fbf' opacity='0.08' font-family='Georgia,serif'%3E%E2%88%91%3C/text%3E%3Ctext x='55' y='150' font-size='18' fill='%231e5fbf' opacity='0.08' font-family='Georgia,serif'%3E%E2%88%9E%3C/text%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Ctext x='8' y='34' font-size='30' fill='%23001A40' opacity='0.08' font-family='Georgia,serif'%3E%E2%88%9A%3C/text%3E%3Ctext x='95' y='55' font-size='22' fill='%23001A40' opacity='0.08' font-family='Georgia,serif'%3E%CF%80%3C/text%3E%3Ctext x='25' y='105' font-size='24' fill='%23001A40' opacity='0.08' font-family='Georgia,serif'%3E%E2%88%AB%3C/text%3E%3Ctext x='105' y='135' font-size='20' fill='%23001A40' opacity='0.08' font-family='Georgia,serif'%3E%E2%88%91%3C/text%3E%3Ctext x='55' y='150' font-size='18' fill='%23001A40' opacity='0.08' font-family='Georgia,serif'%3E%E2%88%9E%3C/text%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 42mm 42mm;
-    padding: 14mm 12mm;
+    padding: 22mm 16mm 16mm;
 }
 
 .diagram {
