@@ -1,11 +1,13 @@
 import base64
 import io
+import re
 import uuid
 from pathlib import Path
 
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
 from jinja2 import Environment, FileSystemLoader
+from markupsafe import Markup, escape
 
 from app.services.extraction import extract_from_image
 from app.services.pdf_generator import generate_pdf
@@ -21,10 +23,28 @@ _sessions: dict[str, list[dict]] = {}
 _CSS = Path("app/static/styles.css").read_text()
 _LOGO_SVG = Path("app/static/logo.svg").read_text()
 
+# A top-level group starts with "1.", "2.", ... at the start of a line — distinct
+# from sub-item markers like "(i)", "(ii)" which stay inside the same group.
+_GROUP_START = re.compile(r"^\s*\d+\.\s")
+
+
+def _format_content(content: str) -> Markup:
+    groups: list[list[str]] = []
+    for line in content.split("\n"):
+        if not groups or _GROUP_START.match(line):
+            groups.append([line])
+        else:
+            groups[-1].append(line)
+    return Markup("\n").join(
+        Markup('<div class="content-group">{}</div>').format(escape("\n".join(g)))
+        for g in groups
+    )
+
 
 def _render(results: list[dict], session_id: str) -> str:
+    formatted = [{**r, "content": _format_content(r["content"])} for r in results]
     return _jinja.get_template("preview.html").render(
-        results=results,
+        results=formatted,
         session_id=session_id,
         inline_css=_CSS,
         logo_svg=_LOGO_SVG,

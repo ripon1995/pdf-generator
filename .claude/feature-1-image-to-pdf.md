@@ -31,6 +31,7 @@ Reference: `app/static/Exercise 10.4 - Integration Document.pdf` — a plain, pr
 - Plain white pages, standard **20mm margin** on all sides (`.page-inner` padding). No colored border, no background watermark.
 - The **NumberNest logo** (`app/static/logo.svg`, inlined per `logo_svg` in `app/routers/pdf.py`) appears once, as a document header at the top of **page 1 only** — right-aligned, ~14mm tall, followed by a double rule (2px + 1px, `#001A40`) separating it from the content. Not repeated on subsequent pages.
 - No browser-style print chrome (date/title header, file-path/page-number footer) — that's an artifact of how the reference PDF happened to be produced (browser "Print to PDF"), not an intentional design element.
+- Extra vertical space (9mm) between numbered problem groups (e.g. between a "1. ..." block and the following "2. ..." block), so groups read as visually distinct sections rather than running together. Implemented by splitting extracted content on lines matching `^\d+\.\s` (`app/routers/pdf.py::_format_content`) into `.content-group` divs; sub-items like "(i)", "(ii)" stay inside the same group. This relies on the extraction prompt's numbering convention (top-level `1.`, `2.` vs. parenthesized sub-items) — if that convention changes, update `_GROUP_START` accordingly.
 
 ## Notes
 

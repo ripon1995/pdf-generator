@@ -159,6 +159,11 @@ body {
     word-wrap: break-word;
 }
 
+/* Extra breathing room between numbered problem groups (e.g. "1. ..." vs "2. ...") */
+.content-group + .content-group {
+    margin-top: 9mm;
+}
+
 /* ── Print / PDF ── */
 @page {
     size: A4;
