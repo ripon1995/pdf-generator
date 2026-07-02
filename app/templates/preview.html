@@ -32,7 +32,6 @@
     {% for result in results %}
     <section class="page">
         <div class="page-inner">
-            {% if loop.first %}
             <div class="doc-header">
                 <div class="doc-header-spacer"></div>
                 {% if chapter %}
@@ -42,7 +41,6 @@
             </div>
             <div class="doc-header-rule"></div>
             <div class="doc-header-rule-thin"></div>
-            {% endif %}
 
             {% if result.has_diagram %}
             <div class="diagram">
