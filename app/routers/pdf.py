@@ -4,7 +4,7 @@ import re
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi import APIRouter, File, Form, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
 from jinja2 import Environment, FileSystemLoader
 from markupsafe import Markup, escape
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/pdf", tags=["pdf"])
 
 _jinja = Environment(loader=FileSystemLoader("app/templates"), autoescape=True)
 
-_sessions: dict[str, list[dict]] = {}
+_sessions: dict[str, dict] = {}
 
 # Inlined (not linked/referenced by <img src>) so Playwright's page.set_content() —
 # which has no page origin to resolve a relative URL against — still renders styled output.
@@ -41,18 +41,19 @@ def _format_content(content: str) -> Markup:
     )
 
 
-def _render(results: list[dict], session_id: str) -> str:
+def _render(results: list[dict], session_id: str, chapter: str) -> str:
     formatted = [{**r, "content": _format_content(r["content"])} for r in results]
     return _jinja.get_template("preview.html").render(
         results=formatted,
         session_id=session_id,
         inline_css=_CSS,
         logo_svg=_LOGO_SVG,
+        chapter=chapter,
     )
 
 
 @router.post("/generate")
-async def generate(images: list[UploadFile] = File(...)):
+async def generate(images: list[UploadFile] = File(...), chapter: str = Form(...)):
     if not images:
         raise HTTPException(status_code=400, detail="No images provided.")
 
@@ -69,24 +70,24 @@ async def generate(images: list[UploadFile] = File(...)):
         })
 
     session_id = str(uuid.uuid4())
-    _sessions[session_id] = results
+    _sessions[session_id] = {"results": results, "chapter": chapter.strip()}
     return RedirectResponse(url=f"/pdf/preview/{session_id}", status_code=303)
 
 
 @router.get("/preview/{session_id}", response_class=HTMLResponse)
 async def preview(session_id: str):
-    results = _sessions.get(session_id)
-    if not results:
+    session = _sessions.get(session_id)
+    if not session:
         raise HTTPException(status_code=404, detail="Session not found or expired.")
-    return HTMLResponse(_render(results, session_id))
+    return HTMLResponse(_render(session["results"], session_id, session["chapter"]))
 
 
 @router.get("/download/{session_id}")
 async def download(session_id: str):
-    results = _sessions.get(session_id)
-    if not results:
+    session = _sessions.get(session_id)
+    if not session:
         raise HTTPException(status_code=404, detail="Session not found or expired.")
-    html = _render(results, session_id)
+    html = _render(session["results"], session_id, session["chapter"])
     pdf_bytes = await generate_pdf(html)
     return StreamingResponse(
         io.BytesIO(pdf_bytes),

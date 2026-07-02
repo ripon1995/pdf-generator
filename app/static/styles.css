@@ -60,6 +60,23 @@ body {
 
 .file-input-label input { display: none; }
 
+.text-input {
+    display: block;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 12px 14px;
+    font-family: sans-serif;
+    font-size: 10pt;
+    color: #333;
+    margin-bottom: 24px;
+}
+
+.text-input:focus {
+    outline: none;
+    border-color: #555;
+}
+
 .btn {
     display: inline-block;
     background: #1a1a1a;
@@ -115,16 +132,39 @@ body {
 
 .page-inner {
     padding: 20mm;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Ctext x='8' y='34' font-size='30' fill='%23001A40' opacity='0.08' font-family='Georgia,serif'%3E%E2%88%9A%3C/text%3E%3Ctext x='95' y='55' font-size='22' fill='%23001A40' opacity='0.08' font-family='Georgia,serif'%3E%CF%80%3C/text%3E%3Ctext x='25' y='105' font-size='24' fill='%23001A40' opacity='0.08' font-family='Georgia,serif'%3E%E2%88%AB%3C/text%3E%3Ctext x='105' y='135' font-size='20' fill='%23001A40' opacity='0.08' font-family='Georgia,serif'%3E%E2%88%91%3C/text%3E%3Ctext x='55' y='150' font-size='18' fill='%23001A40' opacity='0.08' font-family='Georgia,serif'%3E%E2%88%9E%3C/text%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 42mm 42mm;
 }
 
-/* Document header: logo + double rule, first page only */
+/* Document header: chapter label (centered) + logo (right) + double rule, first page only */
 .doc-header {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
     margin-bottom: 6mm;
 }
 
-.doc-header svg {
+.doc-header-spacer {
+    flex: 1;
+}
+
+.doc-header-chapter {
+    flex: 1;
+    text-align: center;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-weight: 700;
+    font-size: 13pt;
+    color: #001A40;
+}
+
+.doc-header-logo {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.doc-header-logo svg {
     display: block;
     width: auto;
     height: 14mm;

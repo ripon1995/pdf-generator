@@ -33,7 +33,13 @@
     <section class="page">
         <div class="page-inner">
             {% if loop.first %}
-            <div class="doc-header">{{ logo_svg | safe }}</div>
+            <div class="doc-header">
+                <div class="doc-header-spacer"></div>
+                {% if chapter %}
+                <div class="doc-header-chapter">Chapter - {{ chapter }}</div>
+                {% endif %}
+                <div class="doc-header-logo">{{ logo_svg | safe }}</div>
+            </div>
             <div class="doc-header-rule"></div>
             <div class="doc-header-rule-thin"></div>
             {% endif %}
