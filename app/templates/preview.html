@@ -31,9 +31,13 @@
 <div class="page-canvas">
     {% for result in results %}
     <section class="page">
-        <div class="brand-mark">{{ logo_svg | safe }}</div>
-
         <div class="page-inner">
+            {% if loop.first %}
+            <div class="doc-header">{{ logo_svg | safe }}</div>
+            <div class="doc-header-rule"></div>
+            <div class="doc-header-rule-thin"></div>
+            {% endif %}
+
             {% if result.has_diagram %}
             <div class="diagram">
                 <img src="data:{{ result.image_mime }};base64,{{ result.image_b64 }}" alt="Diagram">

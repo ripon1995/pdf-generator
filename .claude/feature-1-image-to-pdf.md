@@ -26,11 +26,11 @@ Before the PDF is downloaded, the user should be shown a preview of the generate
 
 ## Branding & Page Styling
 
-- Every page must have a margin, marked by a **thin (1px) dark-blue rule** (`#001A40`) framing the page.
-- In the top margin of every page, show the **NumberNest logo**, top-right, at 70% of its original display size (black "Number" + black square-root icon + yellow "Nest", with tagline).
-  - Asset: `app/static/logo.svg`. Inlined into `preview.html` server-side (via `logo_svg` template var in `app/routers/pdf.py`) rather than linked, since Playwright's `page.set_content()` has no page origin to resolve a relative `<img src>` against.
-  - `.brand-mark` needs an explicit `z-index` above `.page-inner` — both are `position: relative`/`absolute` with `z-index: auto`, so without it, `.page-inner`'s opaque background paints over the logo since it comes later in the DOM (this only stayed hidden while `.page` had thick padding keeping the two from ever overlapping).
-- Each page should include a subtle **mathematical watermark** in the background (e.g. faint math symbols/equations), since generated PDFs are predominantly mathematical content. Watermark must not obscure or interfere with readability of the extracted content.
+Reference: `app/static/Exercise 10.4 - Integration Document.pdf` — a plain, print-clean document style (no colored margin, no watermark). Superseded an earlier heavier-branded design (colored margin band/border, per-page watermark, per-page logo corner mark) in favor of matching this reference.
+
+- Plain white pages, standard **20mm margin** on all sides (`.page-inner` padding). No colored border, no background watermark.
+- The **NumberNest logo** (`app/static/logo.svg`, inlined per `logo_svg` in `app/routers/pdf.py`) appears once, as a document header at the top of **page 1 only** — right-aligned, ~14mm tall, followed by a double rule (2px + 1px, `#001A40`) separating it from the content. Not repeated on subsequent pages.
+- No browser-style print chrome (date/title header, file-path/page-number footer) — that's an artifact of how the reference PDF happened to be produced (browser "Print to PDF"), not an intentional design element.
 
 ## Notes
 
