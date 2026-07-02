@@ -2,8 +2,8 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    grok_api_key: str
-    grok_model: str = "grok-2-vision-1212"
+    gemini_api_key: str
+    gemini_model: str = "gemini-2.5-flash"
 
     model_config = {"env_file": ".env"}
 

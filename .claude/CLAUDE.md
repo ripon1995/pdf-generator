@@ -23,14 +23,14 @@ App runs at `http://localhost:8000`.
 source .venv-pdf-generator/bin/activate
 pip install -r requirements.txt
 playwright install chromium
-cp .env.example .env   # then fill in GROK_API_KEY
+cp .env.example .env   # then fill in GEMINI_API_KEY
 ```
 
 ## Stack
 
 - **FastAPI** + **Uvicorn** — web framework and ASGI server
 - **Pydantic / pydantic-settings** — models and config from `.env`
-- **OpenAI SDK** — used to call the Grok (xAI) vision API at `https://api.x.ai/v1`
+- **OpenAI SDK** — used to call the Gemini vision API (Google) via its OpenAI-compatible endpoint at `https://generativelanguage.googleapis.com/v1beta/openai/`
 - **Playwright** — headless Chromium for HTML → A4 PDF rendering
 - **Jinja2** — server-side HTML templates
 - **MathJax 3 (CDN)** — LaTeX rendering in both browser preview and PDF
@@ -56,8 +56,8 @@ After the PDF is confirmed via preview, upload it to a pre-configured Google Dri
 ## Key files
 
 - `main.py` — FastAPI app entry point; mounts `/static`, includes `pdf` router, serves upload page at `/`
-- `app/core/config.py` — `Settings` loaded from `.env` via pydantic-settings (`GROK_API_KEY`, `GROK_MODEL`)
-- `app/services/extraction.py` — calls Grok vision API to extract text + LaTeX math; returns `(content, has_diagram)`
+- `app/core/config.py` — `Settings` loaded from `.env` via pydantic-settings (`GEMINI_API_KEY`, `GEMINI_MODEL`)
+- `app/services/extraction.py` — calls Gemini vision API to extract text + LaTeX math; returns `(content, has_diagram)`
 - `app/services/pdf_generator.py` — takes rendered HTML string, runs Playwright headless Chromium, returns A4 PDF bytes
 - `app/routers/pdf.py` — three routes: `POST /pdf/generate`, `GET /pdf/preview/{id}`, `GET /pdf/download/{id}`; sessions held in memory dict
 - `app/templates/preview.html` — shared template for browser preview and Playwright PDF; MathJax renders LaTeX

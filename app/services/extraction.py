@@ -3,8 +3,8 @@ from openai import AsyncOpenAI
 from app.core.config import settings
 
 _client = AsyncOpenAI(
-    api_key=settings.grok_api_key,
-    base_url="https://api.x.ai/v1",
+    api_key=settings.gemini_api_key,
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
 )
 
 _PROMPT = """Extract all content from this image precisely.
@@ -22,7 +22,7 @@ async def extract_from_image(image_bytes: bytes, mime_type: str) -> tuple[str, b
     """Returns (extracted_content, has_diagram)."""
     b64 = base64.b64encode(image_bytes).decode()
     response = await _client.chat.completions.create(
-        model=settings.grok_model,
+        model=settings.gemini_model,
         messages=[
             {
                 "role": "user",

@@ -4,7 +4,7 @@ A FastAPI web app that converts images (photos of notes, textbooks, whiteboards,
 
 ## Features
 
-- **Image to PDF** — Upload one or more images; the app extracts all text, math (LaTeX), and diagrams using the Grok vision API, then renders a clean A4 PDF via headless Chromium.
+- **Image to PDF** — Upload one or more images; the app extracts all text, math (LaTeX), and diagrams using the Gemini vision API, then renders a clean A4 PDF via headless Chromium.
 - **Preview before download** — Extracted content is shown in a browser preview (MathJax renders LaTeX live) before the PDF is downloaded.
 - **Google Drive upload** — After the user confirms the preview, the PDF is uploaded to a pre-configured Google Drive folder.
 
@@ -13,7 +13,7 @@ A FastAPI web app that converts images (photos of notes, textbooks, whiteboards,
 | Layer | Technology |
 |---|---|
 | Web framework | FastAPI + Uvicorn |
-| Vision / extraction | Grok API (xAI) via OpenAI SDK |
+| Vision / extraction | Gemini API (Google) via OpenAI SDK |
 | PDF rendering | Playwright (headless Chromium) |
 | Math rendering | MathJax 3 (CDN) |
 | Templates | Jinja2 |
@@ -22,7 +22,7 @@ A FastAPI web app that converts images (photos of notes, textbooks, whiteboards,
 ## Requirements
 
 - Python 3.14.4
-- A Grok (xAI) API key
+- A Gemini (Google AI Studio) API key
 
 ## Setup
 
@@ -39,15 +39,15 @@ playwright install chromium
 
 # 4. Configure environment variables
 cp .env.example .env
-# Edit .env and fill in your GROK_API_KEY
+# Edit .env and fill in your GEMINI_API_KEY
 ```
 
 ### Environment variables
 
 | Variable | Description | Default |
 |---|---|---|
-| `GROK_API_KEY` | Your xAI / Grok API key | _(required)_ |
-| `GROK_MODEL` | Grok vision model to use | `grok-2-vision-1212` |
+| `GEMINI_API_KEY` | Your Gemini API key | _(required)_ |
+| `GEMINI_MODEL` | Gemini vision model to use | `gemini-2.5-flash` |
 
 ## Running
 
@@ -89,7 +89,7 @@ Open `http://localhost:8000` in your browser.
 │   ├── routers/
 │   │   └── pdf.py              # /pdf/* route handlers
 │   ├── services/
-│   │   ├── extraction.py       # Grok vision API — text + LaTeX + diagram extraction
+│   │   ├── extraction.py       # Gemini vision API — text + LaTeX + diagram extraction
 │   │   └── pdf_generator.py    # Playwright HTML → PDF
 │   ├── templates/
 │   │   ├── upload.html         # Image upload form
