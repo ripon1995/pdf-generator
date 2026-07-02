@@ -39,3 +39,7 @@ Reference: `app/static/Exercise 10.4 - Integration Document.pdf` — a plain, pr
 
 - Math rendering in the output PDF must support LaTeX (e.g. via WeasyPrint + MathJax, ReportLab, or a LaTeX compiler)
 - Diagram extraction may require a separate vision/detection step distinct from text/math extraction
+
+## Future Work
+
+- **Retry-with-backoff for Gemini extraction calls.** `app/routers/pdf.py` extracts images sequentially, one Gemini API call per image, with no retry logic (`app/services/extraction.py`). Larger batches (e.g. ~15 images in one upload) can burst past the free tier's requests-per-minute cap, and a single 429 mid-batch currently fails the whole request with no partial recovery. No hard cap on image count exists today — this is a reliability gap, not a hard limit.
