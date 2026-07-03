@@ -1,6 +1,7 @@
 import base64
-from openai import AsyncOpenAI
+from openai import APIError, AsyncOpenAI
 from app.core.config import settings
+from app.core.errors import extraction_error_from_openai
 
 _client = AsyncOpenAI(
     api_key=settings.gemini_api_key,
@@ -21,21 +22,24 @@ Rules:
 async def extract_from_image(image_bytes: bytes, mime_type: str) -> tuple[str, bool]:
     """Returns (extracted_content, has_diagram)."""
     b64 = base64.b64encode(image_bytes).decode()
-    response = await _client.chat.completions.create(
-        model=settings.gemini_model,
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:{mime_type};base64,{b64}"},
-                    },
-                    {"type": "text", "text": _PROMPT},
-                ],
-            }
-        ],
-    )
+    try:
+        response = await _client.chat.completions.create(
+            model=settings.gemini_model,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:{mime_type};base64,{b64}"},
+                        },
+                        {"type": "text", "text": _PROMPT},
+                    ],
+                }
+            ],
+        )
+    except APIError as e:
+        raise extraction_error_from_openai(e) from e
     raw = response.choices[0].message.content or ""
     has_diagram = "[HAS_DIAGRAM]" in raw
     content = raw.replace("[HAS_DIAGRAM]", "").strip()

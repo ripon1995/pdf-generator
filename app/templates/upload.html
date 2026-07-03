@@ -12,6 +12,10 @@
         <h1>PDF Generator</h1>
         <p>Upload images containing text, equations, or diagrams.<br>We'll extract the content and build a clean A4 PDF.</p>
 
+        {% if error %}
+        <div class="error-banner">{{ error }}</div>
+        {% endif %}
+
         <form action="/pdf/generate" method="post" enctype="multipart/form-data" id="upload-form">
             <label class="file-input-label" id="file-label">
                 <input type="file" name="images" multiple accept="image/*" id="file-input">

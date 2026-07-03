@@ -7,6 +7,7 @@ from fastapi import APIRouter, File, Form, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse, RedirectResponse
 from jinja2 import Environment, FileSystemLoader
 
+from app.core.errors import ExtractionError
 from app.services.content_formatting import format_content
 from app.services.drive_upload import upload_pdf_to_drive
 from app.services.extraction import extract_from_image
@@ -41,16 +42,22 @@ async def generate(images: list[UploadFile] = File(...), chapter: str = Form(...
         raise HTTPException(status_code=400, detail="No images provided.")
 
     results = []
-    for img in images:
-        data = await img.read()
-        mime = img.content_type or "image/jpeg"
-        content, has_diagram = await extract_from_image(data, mime)
-        results.append({
-            "content": content,
-            "has_diagram": has_diagram,
-            "image_b64": base64.b64encode(data).decode() if has_diagram else None,
-            "image_mime": mime,
-        })
+    try:
+        for img in images:
+            data = await img.read()
+            mime = img.content_type or "image/jpeg"
+            content, has_diagram = await extract_from_image(data, mime)
+            results.append({
+                "content": content,
+                "has_diagram": has_diagram,
+                "image_b64": base64.b64encode(data).decode() if has_diagram else None,
+                "image_mime": mime,
+            })
+    except ExtractionError as e:
+        return HTMLResponse(
+            _jinja.get_template("upload.html").render(error=e.message),
+            status_code=502,
+        )
 
     session_id = str(uuid.uuid4())
     _sessions[session_id] = {"results": results, "chapter": chapter.strip()}

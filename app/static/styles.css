@@ -45,6 +45,19 @@ body {
     font-family: sans-serif;
 }
 
+.error-banner {
+    background: rgba(220, 76, 76, 0.12);
+    border: 1px solid rgba(220, 76, 76, 0.4);
+    border-radius: 6px;
+    padding: 12px 16px;
+    color: #F5B5B5;
+    font-family: sans-serif;
+    font-size: 9.5pt;
+    line-height: 1.5;
+    text-align: left;
+    margin-bottom: 24px;
+}
+
 .file-input-label {
     display: block;
     border: 2px dashed rgba(255,255,255,0.25);
