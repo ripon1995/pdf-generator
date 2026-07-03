@@ -22,6 +22,10 @@
                 <span id="file-hint">Click to choose images, or drag &amp; drop</span>
             </label>
             <input type="text" name="chapter" id="chapter-input" class="text-input" placeholder="Enter chapter name (e.g. 3.7)" required>
+            <select name="provider" id="provider-input" class="text-input">
+                <option value="gemini">Gemini</option>
+                <option value="huggingface">Hugging Face</option>
+            </select>
             <button type="submit" class="btn" id="submit-btn">Extract &amp; Preview</button>
         </form>
     </div>

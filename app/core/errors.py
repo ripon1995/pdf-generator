@@ -15,20 +15,27 @@ def _parse_retry_after_seconds(exc: Exception) -> float | None:
     return float(match.group(1)) if match else None
 
 
-def extraction_error_from_openai(exc: Exception) -> ExtractionError:
-    """Maps an openai SDK exception (raised by the Gemini-compatible endpoint) to an ExtractionError."""
+_PROVIDER_LABELS = {"gemini": "Gemini", "huggingface": "Hugging Face"}
+_PROVIDER_KEY_ENV = {"gemini": "GEMINI_API_KEY", "huggingface": "HUGGINGFACE_API_KEY"}
+
+
+def extraction_error_from_openai(exc: Exception, provider: str = "gemini") -> ExtractionError:
+    """Maps an openai SDK exception (raised by a Gemini/Hugging Face-compatible endpoint) to an ExtractionError."""
     from openai import AuthenticationError, RateLimitError
+
+    label = _PROVIDER_LABELS.get(provider, provider)
+    key_env = _PROVIDER_KEY_ENV.get(provider, "API key")
 
     if isinstance(exc, RateLimitError):
         retry_after = _parse_retry_after_seconds(exc)
         wait_hint = f" Please wait about {int(retry_after)}s and try again." if retry_after else " Please wait a moment and try again."
         return ExtractionError(
-            "The AI extraction service has hit its usage quota (Gemini free tier limit)." + wait_hint,
+            f"The AI extraction service has hit its usage quota ({label} free tier limit)." + wait_hint,
             retry_after_seconds=retry_after,
         )
     if isinstance(exc, AuthenticationError):
         return ExtractionError(
-            "The AI extraction service rejected our API key. Check the GEMINI_API_KEY configuration."
+            f"The AI extraction service rejected our API key. Check the {key_env} configuration."
         )
     return ExtractionError(
         "The AI extraction service failed unexpectedly. Please try again in a moment."

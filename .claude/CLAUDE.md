@@ -36,7 +36,7 @@ Google Drive upload (Feature 2) uses OAuth2, authorized once per machine:
 
 - **FastAPI** + **Uvicorn** — web framework and ASGI server
 - **Pydantic / pydantic-settings** — models and config from `.env`
-- **OpenAI SDK** — used to call the Gemini vision API (Google) via its OpenAI-compatible endpoint at `https://generativelanguage.googleapis.com/v1beta/openai/`
+- **OpenAI SDK** — used to call vision APIs via OpenAI-compatible endpoints: Gemini (Google) at `https://generativelanguage.googleapis.com/v1beta/openai/`, Hugging Face Inference Providers at `https://router.huggingface.co/v1`. Provider is chosen per-upload from the form on the upload page.
 - **Playwright** — headless Chromium for HTML → A4 PDF rendering
 - **Jinja2** — server-side HTML templates
 - **MathJax 3 (CDN)** — LaTeX rendering in both browser preview and PDF
@@ -62,8 +62,8 @@ From the preview page, an "Upload to Drive" button uploads the generated PDF to 
 ## Key files
 
 - `main.py` — FastAPI app entry point; mounts `/static`, includes `pdf` router, serves upload page at `/`
-- `app/core/config.py` — `Settings` loaded from `.env` via pydantic-settings (`GEMINI_API_KEY`, `GEMINI_MODEL`)
-- `app/services/extraction.py` — calls Gemini vision API to extract text + LaTeX math; returns `(content, has_diagram)`
+- `app/core/config.py` — `Settings` loaded from `.env` via pydantic-settings (`GEMINI_API_KEY`, `GEMINI_MODEL`, `HUGGINGFACE_API_KEY`, `HUGGINGFACE_MODEL`)
+- `app/services/extraction.py` — calls the Gemini or Hugging Face vision API (selected via a `provider` argument, `"gemini"`/`"huggingface"`) to extract text + LaTeX math; returns `(content, has_diagram)`
 - `app/services/content_formatting.py` — `format_content()`: strips board/admission-exam reference tags and splits numbered problem groups into `.content-group` divs
 - `app/services/pdf_generator.py` — takes rendered HTML string, runs Playwright headless Chromium, returns A4 PDF bytes
 - `app/routers/pdf.py` — four routes: `POST /pdf/generate`, `GET /pdf/preview/{id}`, `GET /pdf/download/{id}`, `POST /pdf/upload/{id}` (Drive upload); sessions held in memory dict

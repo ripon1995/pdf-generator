@@ -1,5 +1,6 @@
 import base64
 import io
+import logging
 import uuid
 from pathlib import Path
 
@@ -12,6 +13,8 @@ from app.services.content_formatting import format_content
 from app.services.drive_upload import upload_pdf_to_drive
 from app.services.extraction import extract_from_image
 from app.services.pdf_generator import generate_pdf
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/pdf", tags=["pdf"])
 
@@ -36,17 +39,26 @@ def _render(results: list[dict], session_id: str, chapter: str) -> str:
     )
 
 
+_PROVIDERS = {"gemini", "huggingface"}
+
+
 @router.post("/generate")
-async def generate(images: list[UploadFile] = File(...), chapter: str = Form(...)):
+async def generate(
+    images: list[UploadFile] = File(...),
+    chapter: str = Form(...),
+    provider: str = Form("gemini"),
+):
     if not images:
         raise HTTPException(status_code=400, detail="No images provided.")
+    if provider not in _PROVIDERS:
+        raise HTTPException(status_code=400, detail=f"Unknown extraction provider: {provider}")
 
     results = []
     try:
         for img in images:
             data = await img.read()
             mime = img.content_type or "image/jpeg"
-            content, has_diagram = await extract_from_image(data, mime)
+            content, has_diagram = await extract_from_image(data, mime, provider)
             results.append({
                 "content": content,
                 "has_diagram": has_diagram,
@@ -54,6 +66,7 @@ async def generate(images: list[UploadFile] = File(...), chapter: str = Form(...
                 "image_mime": mime,
             })
     except ExtractionError as e:
+        logger.error("Extraction failed for chapter=%r provider=%r: %s", chapter, provider, e.message)
         return HTMLResponse(
             _jinja.get_template("upload.html").render(error=e.message),
             status_code=502,
@@ -97,6 +110,7 @@ async def upload_to_drive(session_id: str):
     try:
         file = await upload_pdf_to_drive(pdf_bytes, filename)
     except Exception as e:
+        logger.exception("Drive upload failed for session=%s filename=%r", session_id, filename)
         return JSONResponse(
             status_code=502,
             content={"success": False, "data": None, "message": "Upload failed", "error": str(e)},
