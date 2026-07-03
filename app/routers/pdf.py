@@ -12,6 +12,7 @@ from app.core.errors import ExtractionError
 from app.services.content_formatting import format_content
 from app.services.drive_upload import upload_pdf_to_drive
 from app.services.extraction import extract_from_image
+from app.services.image_normalization import normalize_image
 from app.services.pdf_generator import generate_pdf
 
 logger = logging.getLogger(__name__)
@@ -22,10 +23,14 @@ _jinja = Environment(loader=FileSystemLoader("app/templates"), autoescape=True)
 
 _sessions: dict[str, dict] = {}
 
-# Inlined (not linked/referenced by <img src>) so Playwright's page.set_content() —
-# which has no page origin to resolve a relative URL against — still renders styled output.
+# Inlined (not linked/referenced by <img src>/<script src>) so Playwright's
+# page.set_content() — which has no page origin to resolve a relative URL against,
+# and whose null origin makes Chromium block cross-origin CDN scripts served with
+# Cross-Origin-Resource-Policy: same-origin (e.g. jsdelivr) — still renders styled,
+# math-typeset output.
 _CSS = Path("app/static/styles.css").read_text()
 _LOGO_SVG = Path("app/static/logo.svg").read_text()
+_MATHJAX_JS = Path("app/static/vendor/mathjax/tex-svg.js").read_text()
 
 
 def _render(results: list[dict], session_id: str, chapter: str) -> str:
@@ -35,6 +40,7 @@ def _render(results: list[dict], session_id: str, chapter: str) -> str:
         session_id=session_id,
         inline_css=_CSS,
         logo_svg=_LOGO_SVG,
+        mathjax_js=_MATHJAX_JS,
         chapter=chapter,
     )
 
@@ -56,8 +62,8 @@ async def generate(
     results = []
     try:
         for img in images:
-            data = await img.read()
-            mime = img.content_type or "image/jpeg"
+            raw = await img.read()
+            data, mime = normalize_image(raw, img.filename or "image")
             content, has_diagram = await extract_from_image(data, mime, provider)
             results.append({
                 "content": content,
