@@ -19,12 +19,14 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    background: linear-gradient(160deg, #001A40 0%, #061B33 55%, #0A0F1C 100%);
 }
 
 .upload-card {
-    background: #fff;
+    background: #0F2A52;
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 8px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     padding: 48px 56px;
     width: 480px;
     text-align: center;
@@ -33,11 +35,11 @@ body {
 .upload-card h1 {
     font-size: 22pt;
     margin: 0 0 8px;
-    color: #111;
+    color: #fff;
 }
 
 .upload-card p {
-    color: #666;
+    color: #A9B8CE;
     margin: 0 0 32px;
     font-size: 10pt;
     font-family: sans-serif;
@@ -45,53 +47,59 @@ body {
 
 .file-input-label {
     display: block;
-    border: 2px dashed #bbb;
+    border: 2px dashed rgba(255,255,255,0.25);
     border-radius: 6px;
     padding: 32px 16px;
     cursor: pointer;
-    color: #555;
+    color: #C7D2E0;
     font-family: sans-serif;
     font-size: 10pt;
     transition: border-color 0.2s;
     margin-bottom: 24px;
 }
 
-.file-input-label:hover { border-color: #555; }
+.file-input-label:hover { border-color: rgba(255,255,255,0.5); }
 
 .file-input-label input { display: none; }
 
 .text-input {
     display: block;
     width: 100%;
-    border: 1px solid #ccc;
+    background: #081B36;
+    border: 1px solid rgba(255,255,255,0.15);
     border-radius: 6px;
     padding: 12px 14px;
     font-family: sans-serif;
     font-size: 10pt;
-    color: #333;
+    color: #E8EDF5;
     margin-bottom: 24px;
+}
+
+.text-input::placeholder {
+    color: #7488A3;
 }
 
 .text-input:focus {
     outline: none;
-    border-color: #555;
+    border-color: rgba(255,255,255,0.5);
 }
 
 .btn {
     display: inline-block;
-    background: #1a1a1a;
-    color: #fff;
+    background: #E8EDF5;
+    color: #001A40;
     border: none;
     border-radius: 5px;
     padding: 12px 36px;
     font-size: 11pt;
     font-family: sans-serif;
+    font-weight: 600;
     cursor: pointer;
     text-decoration: none;
     transition: background 0.2s;
 }
 
-.btn:hover { background: #333; }
+.btn:hover { background: #fff; }
 
 /* ── Preview page ── */
 .preview-bar {
