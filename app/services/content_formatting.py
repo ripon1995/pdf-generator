@@ -7,9 +7,10 @@ from markupsafe import Markup, escape
 _GROUP_START = re.compile(r"^\s*\d+\.\s")
 
 # Bangladesh board/admission-exam reference tags, e.g. "[রা. বো. ১৪, ০২; ঢা. বো. ১৪]"
-# or "[RUET. 07-08]" — either the Bengali abbreviation "বো" ("বোর্ড"/board) or an
-# all-caps institute code (RUET, BUET, DU, RU, ...) followed by a year/number.
-_REF_MARKER = re.compile(r"বো|[A-Z]{2,6}\.?\s*[০-৯0-9]")
+# or "[RUET. 07-08]" / "[KUET: 04-05]" — either the Bengali abbreviation "বো"
+# ("বোর্ড"/board) or an all-caps institute code (RUET, BUET, KUET, DU, RU, ...)
+# followed by a year/number, separated by ".", ":", or "-".
+_REF_MARKER = re.compile(r"বো|[A-Z]{2,6}[.:\-]?\s*[০-৯0-9]")
 # A run of one or more adjacent bracketed tags, optionally joined by ";"/"," —
 # extraction sometimes emits multiple refs as separate brackets rather than one
 # combined bracket, e.g. "[ঢা. বো. ১৪]; [RUET. 07-08]". Removing brackets one at a
