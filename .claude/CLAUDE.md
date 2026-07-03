@@ -58,6 +58,7 @@ After the PDF is confirmed via preview, upload it to a pre-configured Google Dri
 - `main.py` — FastAPI app entry point; mounts `/static`, includes `pdf` router, serves upload page at `/`
 - `app/core/config.py` — `Settings` loaded from `.env` via pydantic-settings (`GEMINI_API_KEY`, `GEMINI_MODEL`)
 - `app/services/extraction.py` — calls Gemini vision API to extract text + LaTeX math; returns `(content, has_diagram)`
+- `app/services/content_formatting.py` — `format_content()`: strips board/admission-exam reference tags and splits numbered problem groups into `.content-group` divs
 - `app/services/pdf_generator.py` — takes rendered HTML string, runs Playwright headless Chromium, returns A4 PDF bytes
 - `app/routers/pdf.py` — three routes: `POST /pdf/generate`, `GET /pdf/preview/{id}`, `GET /pdf/download/{id}`; sessions held in memory dict
 - `app/templates/preview.html` — shared template for browser preview and Playwright PDF; MathJax renders LaTeX
