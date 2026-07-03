@@ -25,7 +25,11 @@
 <!-- Top bar — hidden in print/PDF via @media print -->
 <div class="preview-bar">
     <h2>Preview</h2>
-    <a href="/pdf/download/{{ session_id }}" class="btn">Download PDF</a>
+    <div class="preview-bar-actions">
+        <a href="/pdf/download/{{ session_id }}" class="btn">Download PDF</a>
+        <button type="button" class="btn" id="drive-upload-btn">Upload to Drive</button>
+        <span id="drive-upload-status"></span>
+    </div>
 </div>
 
 <div class="page-canvas">
@@ -54,5 +58,25 @@
     {% endfor %}
 </div>
 
+<script>
+    document.getElementById('drive-upload-btn').addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        const status = document.getElementById('drive-upload-status');
+        btn.disabled = true;
+        btn.textContent = 'Uploading…';
+        status.textContent = '';
+        try {
+            const res = await fetch('/pdf/upload/{{ session_id }}', { method: 'POST' });
+            const data = await res.json();
+            if (!data.success) throw new Error(data.error || 'Upload failed');
+            btn.textContent = 'Uploaded ✓';
+            status.innerHTML = `<a href="${data.data.web_view_link}" target="_blank">View in Drive</a>`;
+        } catch (err) {
+            btn.disabled = false;
+            btn.textContent = 'Upload to Drive';
+            status.textContent = err.message;
+        }
+    });
+</script>
 </body>
 </html>

@@ -1,6 +1,9 @@
 # Environment
 .env
 .venv-pdf-generator/
+*service-account*.json
+client_secret*.json
+token.json
 __pycache__/
 *.pyc
 *.pyo

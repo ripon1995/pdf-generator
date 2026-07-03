@@ -4,10 +4,11 @@ import uuid
 from pathlib import Path
 
 from fastapi import APIRouter, File, Form, UploadFile, HTTPException
-from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse, RedirectResponse
 from jinja2 import Environment, FileSystemLoader
 
 from app.services.content_formatting import format_content
+from app.services.drive_upload import upload_pdf_to_drive
 from app.services.extraction import extract_from_image
 from app.services.pdf_generator import generate_pdf
 
@@ -76,3 +77,26 @@ async def download(session_id: str):
         media_type="application/pdf",
         headers={"Content-Disposition": "attachment; filename=extracted.pdf"},
     )
+
+
+@router.post("/upload/{session_id}")
+async def upload_to_drive(session_id: str):
+    session = _sessions.get(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found or expired.")
+    html = _render(session["results"], session_id, session["chapter"])
+    pdf_bytes = await generate_pdf(html)
+    filename = f"{session['chapter'] or 'extracted'}.pdf"
+    try:
+        file = await upload_pdf_to_drive(pdf_bytes, filename)
+    except Exception as e:
+        return JSONResponse(
+            status_code=502,
+            content={"success": False, "data": None, "message": "Upload failed", "error": str(e)},
+        )
+    return {
+        "success": True,
+        "data": {"file_id": file["id"], "web_view_link": file.get("webViewLink")},
+        "message": "Uploaded to Drive successfully",
+        "error": None,
+    }

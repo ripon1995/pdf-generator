@@ -7,3 +7,6 @@ jinja2
 python-multipart
 python-dotenv
 aiofiles
+google-api-python-client
+google-auth
+google-auth-oauthlib

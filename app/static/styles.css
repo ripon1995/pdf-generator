@@ -121,6 +121,22 @@ body {
     color: #333;
 }
 
+.preview-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#drive-upload-status {
+    font-size: 9pt;
+    font-family: sans-serif;
+    color: #7488A3;
+}
+
+#drive-upload-status a {
+    color: #001A40;
+}
+
 .page-canvas {
     padding: 32px 0 48px;
     display: flex;
