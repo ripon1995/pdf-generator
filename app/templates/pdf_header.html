@@ -1,0 +1,18 @@
+<div style="width:100%; box-sizing:border-box; padding:20mm 20mm 0; font-family:'Segoe UI', Arial, sans-serif;">
+    <style>
+        .pdf-header-row { display:flex; align-items:center; }
+        .pdf-header-spacer { flex:1; }
+        .pdf-header-chapter { flex:1; text-align:center; font-weight:700; font-size:18pt; color:#001A40; }
+        .pdf-header-logo { flex:1; display:flex; justify-content:flex-end; }
+        .pdf-header-logo svg { display:block; width:auto; height:14mm; }
+        .pdf-header-rule { border-top:1px solid #001A40; margin-top:6mm; margin-bottom:0.5mm; }
+        .pdf-header-rule-thin { border-top:1px solid #001A40; margin-bottom:10mm; }
+    </style>
+    <div class="pdf-header-row">
+        <div class="pdf-header-spacer"></div>
+        {% if chapter %}<div class="pdf-header-chapter">অনুশীলনী-{{ chapter }}</div>{% endif %}
+        <div class="pdf-header-logo">{{ logo_svg | safe }}</div>
+    </div>
+    <div class="pdf-header-rule"></div>
+    <div class="pdf-header-rule-thin"></div>
+</div>

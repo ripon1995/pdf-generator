@@ -175,7 +175,11 @@ body {
     background-size: 42mm 42mm;
 }
 
-/* Document header: chapter label (centered) + logo (right) + double rule, first page only */
+/* Document header: chapter label (centered) + logo (right) + double rule.
+   Repeated on every physical PDF page via Playwright's header_template
+   (see pdf_generator.py) rather than in this in-page flow — a <table><thead>
+   reprint hack was tried here and caused the header to disappear from the
+   on-screen preview and added extra top spacing, so it was reverted. */
 .doc-header {
     display: flex;
     align-items: center;
@@ -241,10 +245,15 @@ body {
     margin-top: 9mm;
 }
 
-/* ── Print / PDF ── */
+/* ── Print / PDF ──
+   No `margin` here on purpose: Playwright's page.pdf({ margin }) option is the sole
+   source of truth for page margins (0mm normally, or a larger top margin reserved
+   for header_template — see pdf_generator.py). An explicit @page margin here fights
+   with that JS-side setting: content flows as if margin were what @page says while
+   the header/footer template still renders at the JS-specified offset, so the two
+   collide instead of stacking. */
 @page {
     size: A4;
-    margin: 0;
 }
 
 @media print {
@@ -263,4 +272,17 @@ body {
     }
 
     .page:last-child { page-break-after: avoid; }
+
+    /* Replaced by Playwright's header_template (see pdf_generator.py), which repeats
+       the header on every physical PDF page — the in-flow header only ever rendered
+       once per result, so on overflow its continuation pages were left headerless. */
+    .page-inner {
+        padding-top: 0;
+    }
+
+    .doc-header,
+    .doc-header-rule,
+    .doc-header-rule-thin {
+        display: none;
+    }
 }

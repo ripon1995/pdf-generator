@@ -45,6 +45,10 @@ def _render(results: list[dict], session_id: str, chapter: str) -> str:
     )
 
 
+def _render_header(chapter: str) -> str:
+    return _jinja.get_template("pdf_header.html").render(chapter=chapter, logo_svg=_LOGO_SVG)
+
+
 _PROVIDERS = {"gemini", "huggingface"}
 
 
@@ -97,7 +101,7 @@ async def download(session_id: str):
     if not session:
         raise HTTPException(status_code=404, detail="Session not found or expired.")
     html = _render(session["results"], session_id, session["chapter"])
-    pdf_bytes = await generate_pdf(html)
+    pdf_bytes = await generate_pdf(html, _render_header(session["chapter"]))
     return StreamingResponse(
         io.BytesIO(pdf_bytes),
         media_type="application/pdf",
@@ -111,7 +115,7 @@ async def upload_to_drive(session_id: str):
     if not session:
         raise HTTPException(status_code=404, detail="Session not found or expired.")
     html = _render(session["results"], session_id, session["chapter"])
-    pdf_bytes = await generate_pdf(html)
+    pdf_bytes = await generate_pdf(html, _render_header(session["chapter"]))
     filename = f"{session['chapter'] or 'extracted'}.pdf"
     try:
         file = await upload_pdf_to_drive(pdf_bytes, filename)
