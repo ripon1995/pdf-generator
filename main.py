@@ -5,8 +5,10 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader
 
+from app.core.config import settings
 from app.core.logging import configure_logging
 from app.routers import pdf
+from app.services.extraction import GEMINI_MODELS
 
 configure_logging()
 logger = logging.getLogger(__name__)
@@ -27,4 +29,8 @@ _jinja = Environment(loader=FileSystemLoader("app/templates"), autoescape=True)
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    return HTMLResponse(_jinja.get_template("upload.html").render())
+    return HTMLResponse(
+        _jinja.get_template("upload.html").render(
+            gemini_models=GEMINI_MODELS, selected_gemini_model=settings.gemini_model
+        )
+    )

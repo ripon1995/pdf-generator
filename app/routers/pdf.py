@@ -8,10 +8,11 @@ from fastapi import APIRouter, File, Form, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse, RedirectResponse
 from jinja2 import Environment, FileSystemLoader
 
+from app.core.config import settings
 from app.core.errors import ExtractionError
 from app.services.content_formatting import format_content
 from app.services.drive_upload import upload_pdf_to_drive
-from app.services.extraction import extract_from_image
+from app.services.extraction import GEMINI_MODEL_IDS, GEMINI_MODELS, extract_from_image
 from app.services.image_normalization import normalize_image
 from app.services.pdf_generator import generate_pdf
 
@@ -57,18 +58,22 @@ async def generate(
     images: list[UploadFile] = File(...),
     chapter: str = Form(...),
     provider: str = Form("gemini"),
+    gemini_model: str = Form(settings.gemini_model),
 ):
     if not images:
         raise HTTPException(status_code=400, detail="No images provided.")
     if provider not in _PROVIDERS:
         raise HTTPException(status_code=400, detail=f"Unknown extraction provider: {provider}")
+    if provider == "gemini" and gemini_model not in GEMINI_MODEL_IDS:
+        raise HTTPException(status_code=400, detail=f"Unknown Gemini model: {gemini_model}")
 
+    model = gemini_model if provider == "gemini" else None
     results = []
     try:
         for img in images:
             raw = await img.read()
             data, mime = normalize_image(raw, img.filename or "image")
-            content, has_diagram = await extract_from_image(data, mime, provider)
+            content, has_diagram = await extract_from_image(data, mime, provider, model)
             results.append({
                 "content": content,
                 "has_diagram": has_diagram,
@@ -76,9 +81,16 @@ async def generate(
                 "image_mime": mime,
             })
     except ExtractionError as e:
-        logger.error("Extraction failed for chapter=%r provider=%r: %s", chapter, provider, e.message)
+        logger.error(
+            "Extraction failed for chapter=%r provider=%r model=%r: %s", chapter, provider, model, e.message
+        )
         return HTMLResponse(
-            _jinja.get_template("upload.html").render(error=e.message),
+            _jinja.get_template("upload.html").render(
+                error=e.message,
+                gemini_models=GEMINI_MODELS,
+                selected_provider=provider,
+                selected_gemini_model=gemini_model,
+            ),
             status_code=502,
         )
 

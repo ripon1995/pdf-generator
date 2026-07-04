@@ -9,6 +9,12 @@ logger = logging.getLogger(__name__)
 
 _PROVIDER_LABELS = {"gemini": "Gemini", "huggingface": "Hugging Face"}
 
+GEMINI_MODELS = [
+    ("gemini-2.5-flash", "Gemini 2.5 Flash"),
+    ("gemini-2.5-flash-lite", "Gemini 2.5 Flash-Lite"),
+]
+GEMINI_MODEL_IDS = {model_id for model_id, _ in GEMINI_MODELS}
+
 _PROMPT = """Extract all content from this image precisely.
 
 Rules:
@@ -42,9 +48,9 @@ def _client_for(provider: str) -> AsyncOpenAI:
 
 
 async def extract_from_image(
-    image_bytes: bytes, mime_type: str, provider: str = "gemini"
+    image_bytes: bytes, mime_type: str, provider: str = "gemini", model: str | None = None
 ) -> tuple[str, bool]:
-    """Returns (extracted_content, has_diagram)."""
+    """Returns (extracted_content, has_diagram). `model` overrides the provider's configured default."""
     if provider not in _PROVIDER_CONFIG:
         raise ValueError(f"Unknown extraction provider: {provider}")
     config = _PROVIDER_CONFIG[provider]
@@ -55,7 +61,7 @@ async def extract_from_image(
             f"Set {config['key_env']} in .env."
         )
     client = _client_for(provider)
-    model = config["model"]()
+    model = model or config["model"]()
 
     b64 = base64.b64encode(image_bytes).decode()
     try:

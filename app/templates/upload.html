@@ -23,8 +23,13 @@
             </label>
             <input type="text" name="chapter" id="chapter-input" class="text-input" placeholder="Enter chapter name (e.g. 3.7)" required>
             <select name="provider" id="provider-input" class="text-input">
-                <option value="gemini">Gemini</option>
-                <option value="huggingface">Hugging Face</option>
+                <option value="gemini" {% if (selected_provider or "gemini") == "gemini" %}selected{% endif %}>Gemini</option>
+                <option value="huggingface" {% if selected_provider == "huggingface" %}selected{% endif %}>Hugging Face</option>
+            </select>
+            <select name="gemini_model" id="gemini-model-input" class="text-input">
+                {% for model_id, label in gemini_models %}
+                <option value="{{ model_id }}" {% if model_id == selected_gemini_model %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
             </select>
             <button type="submit" class="btn" id="submit-btn">Extract &amp; Preview</button>
         </form>
@@ -35,6 +40,8 @@
     const input = document.getElementById('file-input');
     const hint  = document.getElementById('file-hint');
     const btn   = document.getElementById('submit-btn');
+    const providerInput   = document.getElementById('provider-input');
+    const geminiModelInput = document.getElementById('gemini-model-input');
 
     input.addEventListener('change', () => {
         const n = input.files.length;
@@ -42,6 +49,12 @@
             ? 'Click to choose images, or drag & drop'
             : `${n} image${n > 1 ? 's' : ''} selected`;
     });
+
+    function syncGeminiModelVisibility() {
+        geminiModelInput.style.display = providerInput.value === 'gemini' ? '' : 'none';
+    }
+    providerInput.addEventListener('change', syncGeminiModelVisibility);
+    syncGeminiModelVisibility();
 
     document.getElementById('upload-form').addEventListener('submit', () => {
         btn.textContent = 'Processing…';
