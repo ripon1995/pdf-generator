@@ -39,6 +39,7 @@ Google Drive upload (Feature 2) uses OAuth2, authorized once per machine:
 - **OpenAI SDK** — used to call vision APIs via OpenAI-compatible endpoints: Gemini (Google) at `https://generativelanguage.googleapis.com/v1beta/openai/`, Hugging Face Inference Providers at `https://router.huggingface.co/v1`. Provider is chosen per-upload from the form on the upload page.
 - **Playwright** — headless Chromium for HTML → A4 PDF rendering
 - **Jinja2** — server-side HTML templates
+- **Pillow / pillow-heif** — used by `image_normalization.py` to convert uploaded images (including HEIC/HEIF from iPhones) to a standard format before extraction
 - **MathJax 3 (vendored, inlined)** — LaTeX rendering in both browser preview and PDF. Bundled at `app/static/vendor/mathjax/tex-svg.js` and inlined as a `<script>` block (not `src=`) rather than loaded from a CDN — Playwright's `page.set_content()` gives the page a null origin, which Chromium can never treat as "same-origin," so a CDN script served with `Cross-Origin-Resource-Policy: same-origin` (e.g. jsdelivr) gets silently blocked and PDFs render raw `$...$` LaTeX instead of typeset math.
 
 ## Project Structure
@@ -47,7 +48,7 @@ See `.claude/project-rule.md` for the full directory layout. Key conventions:
 
 - `app/routers/` — API route handlers
 - `app/services/` — business logic (PDF generation, Drive upload)
-- `app/models/` — Pydantic request/response schemas
+- `app/models/` — currently unused (empty package, no schemas defined yet); request/response shapes today are plain dicts handled directly in `app/routers/pdf.py`
 - `app/templates/` + `app/static/` — Jinja2 HTML templates and CSS
 - `app/core/` — config, logging, shared dependencies
 
@@ -62,8 +63,9 @@ From the preview page, an "Upload to Drive" button uploads the generated PDF to 
 ## Key files
 
 - `main.py` — FastAPI app entry point; mounts `/static`, includes `pdf` router, serves upload page at `/`
-- `app/core/config.py` — `Settings` loaded from `.env` via pydantic-settings (`GEMINI_API_KEY`, `GEMINI_MODEL`, `HUGGINGFACE_API_KEY`, `HUGGINGFACE_MODEL`)
+- `app/core/config.py` — `Settings` loaded from `.env` via pydantic-settings: `GEMINI_API_KEY`, `GEMINI_MODEL`, `HUGGINGFACE_API_KEY`, `HUGGINGFACE_MODEL`, `GOOGLE_DRIVE_FOLDER_ID` (required, no default), `GOOGLE_OAUTH_CLIENT_SECRET_FILE`, `GOOGLE_OAUTH_TOKEN_FILE`, `LOG_LEVEL`
 - `app/services/extraction.py` — calls the Gemini or Hugging Face vision API (selected via a `provider` argument, `"gemini"`/`"huggingface"`) to extract text + LaTeX math; returns `(content, has_diagram)`
+- `app/core/errors.py` — `ExtractionError` (user-facing message + optional `retry_after_seconds`) and `extraction_error_from_openai()`, which maps openai-SDK exceptions (rate limit, auth failure) from either provider into one; `/pdf/generate` catches `ExtractionError` and re-renders the upload page with the message instead of a raw 500
 - `app/services/image_normalization.py` — `normalize_image()`: converts uploaded images (including HEIC/HEIF from iPhones) to a standard format/mime before they're sent to the vision API
 - `app/services/content_formatting.py` — `format_content()`: strips board/admission-exam reference tags and splits numbered problem groups into `.content-group` divs
 - `app/services/pdf_generator.py` — takes rendered HTML string + an optional header HTML string, runs Playwright headless Chromium, returns A4 PDF bytes. When a header is given, uses `page.pdf(display_header_footer=True, header_template=...)` with a reserved `52mm` top margin so the header repeats on every physical PDF page (a single result's content can overflow one A4 page); the in-page `.doc-header` is only ever rendered once per result, so it's hidden under `@media print` in favor of this. Do not set a `margin` on the `@page` CSS at-rule — it fights with this JS-side margin option and the header ends up colliding with content instead of sitting above it.
