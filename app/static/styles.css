@@ -20,6 +20,7 @@ body {
     align-items: center;
     justify-content: center;
     background: linear-gradient(160deg, #001A40 0%, #061B33 55%, #0A0F1C 100%);
+    padding: 24px;
 }
 
 .upload-card {
@@ -28,7 +29,8 @@ body {
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     padding: 48px 56px;
-    width: 480px;
+    width: 100%;
+    max-width: 480px;
     text-align: center;
 }
 
@@ -113,6 +115,20 @@ body {
 }
 
 .btn:hover { background: #fff; }
+
+@media (max-width: 480px) {
+    .upload-card {
+        padding: 32px 24px;
+    }
+
+    .upload-card h1 {
+        font-size: 18pt;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
 
 /* ── Preview page ── */
 .preview-bar {
