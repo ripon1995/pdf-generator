@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    environment: str = "development"
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.5-flash"
     huggingface_api_key: str = ""
