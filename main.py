@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader
 
 from app.core.config import settings
+from app.core.exception_handler import register_exception_handlers
 from app.core.logging import configure_logging
 from app.routers import pdf
 from app.services.extraction import GEMINI_MODELS
@@ -14,6 +15,8 @@ configure_logging()
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="PDF Generator")
+
+register_exception_handlers(app)
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.include_router(pdf.router)

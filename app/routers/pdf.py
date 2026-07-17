@@ -5,11 +5,13 @@ import uuid
 from pathlib import Path
 
 from fastapi import APIRouter, File, Form, UploadFile, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
 from jinja2 import Environment, FileSystemLoader
+from playwright.async_api import Error as PlaywrightError
 
 from app.core.config import settings
 from app.core.errors import ExtractionError
+from app.core.exceptions import DriveUploadException, NotFoundException, PdfRenderingException
 from app.services.content_formatting import format_content
 from app.services.drive_upload import upload_pdf_to_drive
 from app.services.extraction import GEMINI_MODEL_IDS, GEMINI_MODELS, extract_from_image
@@ -48,6 +50,17 @@ def _render(results: list[dict], session_id: str, chapter: str) -> str:
 
 def _render_header(chapter: str) -> str:
     return _jinja.get_template("pdf_header.html").render(chapter=chapter, logo_svg=_LOGO_SVG)
+
+
+async def _render_pdf_for_session(session_id: str, session: dict) -> bytes:
+    html = _render(session["results"], session_id, session["chapter"])
+    try:
+        return await generate_pdf(html, _render_header(session["chapter"]))
+    except PlaywrightError as e:
+        logger.exception("PDF rendering failed for session=%s (Playwright/Chromium error)", session_id)
+        raise PdfRenderingException(
+            "The PDF rendering engine isn't available on the server right now. Please try again shortly."
+        ) from e
 
 
 _PROVIDERS = {"gemini", "huggingface"}
@@ -99,21 +112,23 @@ async def generate(
     return RedirectResponse(url=f"/pdf/preview/{session_id}", status_code=303)
 
 
-@router.get("/preview/{session_id}", response_class=HTMLResponse)
-async def preview(session_id: str):
+def _get_session(session_id: str) -> dict:
     session = _sessions.get(session_id)
     if not session:
-        raise HTTPException(status_code=404, detail="Session not found or expired.")
+        raise NotFoundException("Session not found or expired.")
+    return session
+
+
+@router.get("/preview/{session_id}", response_class=HTMLResponse)
+async def preview(session_id: str):
+    session = _get_session(session_id)
     return HTMLResponse(_render(session["results"], session_id, session["chapter"]))
 
 
 @router.get("/download/{session_id}")
 async def download(session_id: str):
-    session = _sessions.get(session_id)
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found or expired.")
-    html = _render(session["results"], session_id, session["chapter"])
-    pdf_bytes = await generate_pdf(html, _render_header(session["chapter"]))
+    session = _get_session(session_id)
+    pdf_bytes = await _render_pdf_for_session(session_id, session)
     return StreamingResponse(
         io.BytesIO(pdf_bytes),
         media_type="application/pdf",
@@ -123,20 +138,14 @@ async def download(session_id: str):
 
 @router.post("/upload/{session_id}")
 async def upload_to_drive(session_id: str):
-    session = _sessions.get(session_id)
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found or expired.")
-    html = _render(session["results"], session_id, session["chapter"])
-    pdf_bytes = await generate_pdf(html, _render_header(session["chapter"]))
+    session = _get_session(session_id)
+    pdf_bytes = await _render_pdf_for_session(session_id, session)
     filename = f"{session['chapter'] or 'extracted'}.pdf"
     try:
         file = await upload_pdf_to_drive(pdf_bytes, filename)
     except Exception as e:
         logger.exception("Drive upload failed for session=%s filename=%r", session_id, filename)
-        return JSONResponse(
-            status_code=502,
-            content={"success": False, "data": None, "message": "Upload failed", "error": str(e)},
-        )
+        raise DriveUploadException(str(e)) from e
     return {
         "success": True,
         "data": {"file_id": file["id"], "web_view_link": file.get("webViewLink")},

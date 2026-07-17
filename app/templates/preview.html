@@ -69,7 +69,7 @@
         try {
             const res = await fetch('/pdf/upload/{{ session_id }}', { method: 'POST' });
             const data = await res.json();
-            if (!data.success) throw new Error(data.error || 'Upload failed');
+            if (!res.ok || !data.success) throw new Error(data.detail || data.message || 'Upload failed');
             btn.textContent = 'Uploaded ✓';
             status.innerHTML = `<a href="${data.data.web_view_link}" target="_blank">View in Drive</a>`;
         } catch (err) {
