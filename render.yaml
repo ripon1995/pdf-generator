@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: pdf-generator
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt && playwright install --with-deps chromium
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: HUGGINGFACE_API_KEY
+        sync: false
+      - key: HUGGINGFACE_MODEL
+        value: Qwen/Qwen2.5-VL-72B-Instruct
+      - key: GOOGLE_DRIVE_FOLDER_ID
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_SECRET_FILE
+        value: client_secret.json
+      - key: GOOGLE_OAUTH_TOKEN_FILE
+        value: token.json
+      - key: LOG_LEVEL
+        value: INFO
